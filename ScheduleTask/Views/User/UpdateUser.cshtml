@@ -1,0 +1,160 @@
+﻿@model ScheduleTask.Models.User.UpdateUserViewModel
+
+@{
+    ViewBag.Title = "ویرایش حساب کاربری";
+    var isAdmin = User.IsInRole("Admin");
+}
+
+<div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <p class="text-center text-black"><strong>ویرایش حساب کاربری</strong></p>
+        </div>
+        <div class="panel-body row">
+            <form data-ajax="true" data-ajax-method="post" data-ajax-success="SuccessAddUser" enctype="multipart/form-data"
+                  data-ajax-loading="#spinner" id="myform">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="DeleteImage" id="deleteImage">
+                <input type="hidden" asp-for="ExistImage">
+                <input type="hidden" asp-for="Id">
+
+                <div class="col-md-4">
+                    <div class="form-group col-md-12 col-sm-12">
+                        <label style="margin-right: 50px">بارگزاری تصویر</label>
+                        <div class="col-md-12 form-group margin-bottom-40">
+                            @{
+                                if (Model.ExistImage)
+                                {
+                                    <div class="fileinput fileinput-exists" data-provides="fileinput">
+                                        <div class="fileinput-new thumbnail" style="height: 150px;">
+                                            <img alt="عکس کاربر" src="~/Images/NoImage.jpg" asp-append-version="true">
+                                        </div>
+                                        <div class="fileinput-preview fileinput-exists thumbnail" style="height:200px">
+                                            <img alt="عکس کاربر" src="@Url.Action("ShowImage", "User", new {id = Model.Id})"
+                                                 asp-append-version="true"/>
+                                        </div>
+                                        <div>
+                                            <span class="btn default btn-file">
+                                                <span class="fileinput-new btn btn-success"> انتخاب کنید </span>
+                                                <span class="fileinput-exists btn btn-default"> تغییر عکس </span>
+                                                <input asp-for="Image" type="file" accept=".jpg, .png, .jpeg, .tif, .tiff, .JPG"
+                                                       value="@Url.Action("ShowImage", "User", new {id = Model.Id})"/>
+                                            </span>
+                                            <a href="javascript:" class="btn btn-danger fileinput-exists DeleteClass"
+                                               data-dismiss="fileinput"> حذف </a>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                                        <div class="fileinput-new thumbnail" style="height: 150px;">
+                                            <img alt="عکس کاربر" src="~/Images/NoImage.jpg" asp-append-version="true"/>
+                                        </div>
+                                        <div class="fileinput-preview fileinput-exists thumbnail" style="height:200px"> </div>
+                                        <div>
+                                            <span class="btn default btn-file">
+                                                <span class="fileinput-new btn btn-success"> انتخاب کنید </span>
+                                                <span class="fileinput-exists btn btn-default"> تغییر عکس </span>
+                                                <input asp-for="Image" type="file" accept=".jpg, .png, .jpeg, .tif, .tiff, .JPG"/>
+                                            </span>
+                                            <a href="javascript:" class="btn btn-danger fileinput-exists DeleteClass"
+                                               data-dismiss="fileinput"> حذف </a>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 row">
+                    <div id="errors" class="text text-danger"></div>
+
+                    <div class="col-md-6 form-group">
+                        <label asp-for="UserName" class="text text-black"></label>
+                        <input asp-for="UserName" id="inpusername" class="form-control" dir="ltr" required minlength="3">
+                    </div>
+                    @{
+                        if (User.IsInRole("Admin"))
+                        {
+                            <div class="col-md-6 form-group">
+                                <label asp-for="NewPassword" class="text text-black"></label>
+                                <input asp-for="NewPassword" dir="ltr" class="form-control" minlength="6">
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-6 col-md-offset-6"></div>
+                        }
+                    }
+                    <div class="col-md-6 form-group">
+                        <label asp-for="Name" class="text text-black"></label>
+                        <input asp-for="Name" id="inpname" class="form-control" required minlength="3">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label asp-for="Family" class="text text-black"></label>
+                        <input asp-for="Family" id="inpfamily" class="form-control" required minlength="3">
+                    </div>
+
+                    <button type="submit" style="margin-top: 40px" class="btn btn-success pull-left">
+                        <div class="overlay"> ویرایش کاربر
+                            <i style="display: none" id="spinner">
+                                <span class="fa fa-refresh fa-spin"></span>
+                            </i>
+                        </div></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Css
+{
+    <link rel="stylesheet" href="~/plugins/bootstrap-fileinput/bootstrap-fileinput.css">
+    <link rel="stylesheet" href="~/bower_components/jquery-toast-plugin/dist/jquery.toast.min.css">
+}
+@section Script
+{
+    <script src="~/bower_components/Jquery_validation/jquery.validate.min.js"></script>
+    <script src="~/bower_components/Jquery_validation/messages_fa.min.js"></script>
+
+    <script src="~/plugins/bootstrap-fileinput/bootstrap-fileinput.js"></script>
+    
+    <script src="~/bower_components/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+    
+    <script src="~/bower_components/jquery-toast-plugin/dist/jquery.toast.min.js"></script>
+
+    <script>
+    function SuccessAddUser(data) {
+            $('#errors').empty();
+          if (data.status){
+              $.toast({
+                  heading: 'موفقیت آمیز',
+                  text: data.message,
+                  showHideTransition: 'slide',
+                  position: 'top-left',
+                  hideAfter:2500,
+                  icon: 'success'
+              });
+          }
+          else {
+              for (let i in data.message)
+                   $('#errors').append(data.message[i]).append('<br>');
+          }
+        }
+    </script>
+    <script>
+    $('#myform').validate();
+    
+    $('.DeleteClass').on('click',function (){
+        $('#deleteImage').val(true);
+    });
+    
+    let isadmin=@Html.Raw(Json.Serialize(@isAdmin));
+    if (isadmin===false){
+        $('#inpname').prop('readonly', true);
+        $('#inpfamily').prop('readonly', true);
+        $('#inpusername').prop('readonly', true);
+        }
+    </script>
+}

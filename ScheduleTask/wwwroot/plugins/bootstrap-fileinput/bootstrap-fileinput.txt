@@ -1,0 +1,19 @@
+﻿<div class="form-group col-md-3">
+                    <label>بارگزاری تصویر</label>
+                    <div class="col-md-12 form-group margin-bottom-40">
+                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                            <div class="fileinput-new thumbnail" style="height: 150px;">
+                                <img src="~/images/NoImage.jpg" />
+                            </div>
+                            <div class="fileinput-preview fileinput-exists thumbnail" style="height:200px"> </div>
+                            <div>
+                                <span class="btn default btn-file">
+                                    <span class="fileinput-new btn btn-success"> انتخاب کنید </span>
+                                    <span class="fileinput-exists btn btn-default"> تغییر عکس </span>
+                                    <input type="file" name="file" accept=".jpg, .png, .jpeg, .gif, .tif, .tiff, .JPG" />
+                                </span>
+                                <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> حذف </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>

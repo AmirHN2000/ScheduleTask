@@ -1,0 +1,150 @@
+﻿@model ScheduleTask.Models.User.LoginViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>ورود</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.7 -->
+    <link rel="stylesheet" href="~/dist/css/bootstrap-theme.css">
+    
+    <link rel="stylesheet" href="~/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Bootstrap rtl -->
+    <link rel="stylesheet" href="~/dist/css/rtl.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="~/bower_components/Ionicons/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/dist/css/AdminLTE.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+    folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="~/dist/css/skins/_all-skins.min.css">
+
+    <style>
+            .margin-right{
+            margin-right: 0!important;
+            }
+        </style>
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        @*<script src="~/js/html5shiv.min.js"></script>
+        <script src="~/js/respond.min.js"></script>*@
+    <![endif]-->
+
+    <!-- Google Font -->
+    <link rel="stylesheet" href="~/dist/fonts/googlefont.css">
+  
+</head>
+
+<body class="hold-transition login-page">
+<div class="login-box">
+    <div class="login-box-body">
+        <div class="login-logo">
+                <img src="~/Images/logo.png" width="175" height="53" class="logo" alt="logo">
+            </div>
+        <form data-ajax="true" data-ajax-method="post" data-ajax-success="ShowErrors" data-ajax-loading="#spinner" id="myform">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl">
+
+            <div class="form-group has-feedback" style="direction: ltr;text-align: left">
+                <input asp-for="UserName" class="form-control" placeholder="Username" autofocus="autofocus" minlength="3" required>
+                <span class="glyphicon glyphicon-user form-control-feedback pull-right"></span>
+            </div>
+            <div class="form-group has-feedback" style="direction: ltr;text-align: left">
+                <input asp-for="Password" class="form-control" placeholder="Password" minlength="6" required>
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="form-group checkbox">
+                <input asp-for="IsRememberMe" class="margin-right">
+                <label asp-for="IsRememberMe" class="text text-black"></label>
+            </div>
+            <div class="form-group has-feedback">
+                <dnt-captcha asp-captcha-generator-max="99999"
+                             asp-captcha-generator-min="11111"
+                             asp-captcha-generator-language="Persian"
+                             asp-captcha-generator-display-mode="ShowDigits"
+                             asp-use-relative-urls="true"
+                             asp-placeholder="کد امنیتی"
+                             asp-font-name="Tahoma"
+                             asp-font-size="20"
+                             asp-fore-color="#333333"
+                             asp-back-color="#ccc"
+                             asp-text-box-class="text-box single-line form-control col-md-4"
+                             asp-text-box-template="<div class='input-group col-md-6 col-xs-6 pull-right' style='margin-left: 45px'><span class='input-group-addon'><span class='fa fa-user-secret'></span></span>{0}</div>"
+                             asp-validation-message-class="text-danger"
+                             asp-refresh-button-class="glyphicon glyphicon-refresh btn-sm"
+                             asp-show-refresh-button="true"/>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                <div class="overlay"> ورود
+                    <i style="display: none" id="spinner">
+                        <span class="fa fa-refresh fa-spin"></span>
+                    </i>
+                </div></button>
+
+            <div asp-validation-summary="ModelOnly" class="text text-danger" style="margin-top: 8px"></div>
+            <div id="errors" class="text text-danger" style="margin-top: 8px"></div>
+        </form>
+
+    </div>
+</div>
+
+<!-- jQuery 3 -->
+<script src="~/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="~/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- iCheck -->
+<script src="~/plugins/iCheck/icheck.min.js"></script>
+
+<script src="~/bower_components/Jquery_validation/jquery.validate.min.js"></script>
+<script src="~/bower_components/Jquery_validation/messages_fa.min.js"></script>
+<script src="~/bower_components/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="~/bower_components/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+
+<script>
+      $("#myform").validate({
+        errorPlacement: function(error, element) {
+           error.appendTo('#errors');
+         },
+         messages:{
+            UserName:{
+              required:"تکمیل فیلد نام کاربری اجباری است",
+              minlength:"لطفا برای نام کاربری کمتر از {0} حرف وارد نکنید"
+            },
+            Password:{
+              required:"تکمیل فیلد رمز عبور اجباری است",
+              minlength:"لطفا برای رمز عبور کمتر از {0} حرف وارد نکنید"
+            },
+            DNTCaptchaInputText:{
+              required:"تکمیل فیلد کد امنیتی اجباری است"
+            }
+         }
+      });  
+      
+      function ShowErrors(data) {
+        if (data.status){
+            window.location.href=data.link;
+        }
+        else {
+            $('#errors').empty();
+            $('#dntCaptchaRefreshButton').trigger('click');
+            $('input[name=Password]').val('');
+            for (let i in data.message)
+                $('#errors').append(data.message[i]).append('<br>');
+        }
+      }
+</script>
+
+</body>
+</html>

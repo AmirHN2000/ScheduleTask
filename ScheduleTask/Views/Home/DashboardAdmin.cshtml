@@ -1,0 +1,145 @@
+﻿@model ScheduleTask.Models.Home.DashboardViewModel
+@{
+  ViewBag.Title = "داشبورد مدیریت";
+  var done = "انجام شده(درصد)";
+  var pending = "در حال انجام(درصد)";
+  var doneC = Model.DoneD;
+  var pendingC = Model.PendingD;
+}
+
+<div class="row">
+  <div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-red">
+      <div class="inner">
+        <h3>@Model.UserCount</h3>
+        <p>کاربران ثبت شده</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-ios-people"></i>
+      </div>
+      <a asp-controller="User" asp-action="ShowUsers" class="small-box-footer">اطلاعات بیشتر <i class="fa fa-arrow-circle-left"></i></a>
+    </div>
+  </div>
+  <!-- ./col -->
+  <div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-aqua">
+      <div class="inner">
+        <h3>@Model.Total</h3>
+
+        <p>کارهای ثبت شده</p>
+      </div>
+      <div class="icon">
+        <i class="fa fa-tasks" style="font-size: 0.85em"></i>
+      </div>
+      <a asp-controller="Task" asp-action="ShowTasksAdmin" class="small-box-footer">اطلاعات بیشتر <i class="fa fa-arrow-circle-left"></i></a>
+    </div>
+  </div>
+  <!-- ./col -->
+  <div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-green">
+      <div class="inner">
+        <h3>@Model.Done</h3>
+
+        <p>کارهای انجام شده</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-checkmark" style="font-size: 0.95em"></i>
+      </div>
+      <a asp-controller="Task" asp-action="ShowTasksAdmin" asp-route-status="1" class="small-box-footer">اطلاعات بیشتر <i class="fa fa-arrow-circle-left"></i></a>
+    </div>
+  </div>
+  <!-- ./col -->
+  <div class="col-lg-3 col-xs-6">
+    <!-- small box -->
+    <div class="small-box bg-yellow">
+      <div class="inner">
+        <h3>@Model.Pending</h3>
+
+        <p>کارهای در حال انجام</p>
+      </div>
+      <div class="icon">
+        <i class="fa fa-hourglass-half" style="font-size: 0.83em"></i>
+      </div>
+      <a asp-controller="Task" asp-action="ShowTasksAdmin" asp-route-status="0" class="small-box-footer">اطلاعات بیشتر <i class="fa fa-arrow-circle-left"></i></a>
+    </div>
+  </div>
+  <!-- ./col -->
+  <div class="clearfix"></div>
+  <br/>
+  <div class="col-lg-5 col-md-5 col-xs-12" style="margin-top: 66px">
+    <a asp-controller="User" asp-action="AddUser" class="Dashboard-link">
+      <div class="form-group Dashboard-box">
+        <div class="info-box">
+          <span class="info-box-icon bg-gray-active"><i class="fa fa-user-plus"></i></span>
+      
+          <div class="info-box-content">
+            <span class="info-box-text" style="margin-top: 17px;margin-right: 10px"><h4>افزودن کاربر</h4></span>
+          </div>
+          <!-- /.info-box-content -->
+        </div>
+      </div>
+    </a>
+    
+    <a asp-controller="Time" asp-action="EditTime" class="Dashboard-link">
+      <div class="form-group Dashboard-box">
+        <div class="info-box">
+          <span class="info-box-icon bg-teal-gradient"><i class="fa fa-clock-o"></i></span>
+      
+          <div class="info-box-content">
+            <span class="info-box-text" style="margin-top: 17px;margin-right: 10px"><h4>محدوده زمانی افزودن کار</h4></span>
+          </div>
+          <!-- /.info-box-content -->
+        </div>
+      </div>
+    </a>
+  </div>
+  
+  <div class="col-lg-4 col-md-4 col-xs-12 text-center pull-left">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+            <p>عملکرد کاربران در انجام کارها</p>
+          </div>
+      <div id="canvas-holder panel-body">
+        <canvas id="chart-area" width="250" height="250"/>
+      </div>
+    </div>
+    
+  </div>
+  
+</div>
+
+@section Script
+{
+	<script src="~/bower_components/chart.js/Chart.min.js"></script>
+	
+	<script>   
+	let Done=@Html.Raw(Json.Serialize(@done));
+	let Pending=@Html.Raw(Json.Serialize(@pending));
+	let DoneC=@Html.Raw(Json.Serialize(@doneC));
+	let PendingC=@Html.Raw(Json.Serialize(@pendingC));
+    		let pieData = [
+    				{
+    					value: DoneC,
+    					color: "#00a65a",
+    					highlight: "#098421",
+    					label: Done
+    				},
+    				{
+    					value: PendingC,
+    					color: "#f39c12",
+    					highlight: "#d0870c",
+    					label:Pending
+    				},
+    			];
+    
+    			window.onload = function(){
+    				let ctx = document.getElementById("chart-area").getContext("2d");
+    				window.myPie = new Chart(ctx).Pie(pieData);
+    			};
+    	</script>
+}
+
+ 

@@ -1,0 +1,188 @@
+﻿@using TaskStatus = ScheduleTask.Data.TaskStatus
+@model int
+@{
+    ViewBag.Title = "نمایش کارها";
+    var statusModel = Model;
+}
+<div class="text-center">
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <p class="text text-black">جستجوی پیشرفته</p>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3 col-xs-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon" data-mddatetimepicker="true" data-trigger="click" data-targetselector="#fromDate1">
+                                <span class="glyphicon glyphicon-calendar" data-toggle="tooltip" data-placement="top" title="انتخاب تاریخ"></span>
+                            </div>
+                            <input name="fromDate1" autocomplete="false" onchange="changeDate()" class="form-control" id="fromDate1" placeholder="تاریخ" data-mddatetimepicker="true"
+                                   data-placement="bottom" data-englishnumber="false" style="width: 80%"/>
+                            <button id="btnClear" class="btn btn-sm btn-today btnDelete" style="margin-top: 3px"
+                                    data-toggle="tooltip" data-placement="top" title="حذف تاریخ">
+                                <span class="fa fa-trash"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-xs-12 form-group">
+                    <label class="text text-black pull-right" style="margin-top: 7px">وضعیت :</label>
+                    <select class="form-control select2-container pull-right" asp-items="@Html.GetEnumSelectList(typeof(TaskStatus))" style="width: 60%"
+                            id="status" data-toggle="tooltip" data-placement="top" title="انتخاب وضعیت" onchange="changeStatus()">
+                        <option value="-1">همه</option>
+                    </select>
+                </div>
+                <div class="col-md-5 col-xs-12">
+                    <div class="form-group">
+                        <button id="btnSearch" class="btn btn-primary btn-block"
+                                data-toggle="tooltip" data-placement="top" title="جستجو">
+                            <span class="fa fa-search"></span> جستجو
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group col-md-12">
+                    <div class="col-md-2 col-xs-12 pull-right">
+                        <button id="btnClearAllFilter" type="button" class="btn btnDelete btn-today btn-danger">حذف همه فیلترها</button>
+                    </div>
+                    <div class="col-md-6 col-xs-12 pull-right" style="margin: 8px">
+                        <label class="pull-right">فیلتر ها :: </label>
+                        <label id="dateFilter" class="pull-right img-rounded badgeFilter"></label>
+                        <label id="statusFilter" class="pull-right img-rounded badgeFilter"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-heading">
+            <p class="text text-black">لیست کارها</p>
+        </div>
+
+        <div class="panel-body" id="mydiv">
+            <table id="tableShowTasks" class="table table-bordered table-striped table-hover table-responsive" style="width: 100%">
+                <thead>
+                <tr>
+                    <th>شماره</th>
+                    <th>نام کار</th>
+                    <th>تاریخ ایجاد</th>
+                    <th>وضعیت</th>
+                    <th>زمان تقریبی انجام کار</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" id="mymodal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content text-center">
+                    <div class="modal-header" style="background-color: #f5f5f5">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">اطلاعات کار</h4>
+                    </div>
+                    <div class="modal-body">
+                        
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">بستن</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+    </div>
+</div>
+
+
+@section Css
+{
+    <link rel="stylesheet" href="~/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="~/bower_components/jquey datatable/DataTables-1.10.25/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="~/bower_components/Responsive-2.2.9/css/responsive.dataTables.css">
+    
+    <link rel="stylesheet" href="~/bower_components/jQuery-confirm/jquery-confirm.min.css">
+        
+    <link rel="stylesheet" href="~/plugins/MD.BootstrapPersianDateTimePicker-1.6.4-bootstrap3/Content/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="~/plugins/MD.BootstrapPersianDateTimePicker-1.6.4-bootstrap3/Content/MdBootstrapPersianDateTimePicker/jquery.Bootstrap-PersianDateTimePicker.min.css">
+}
+@section Script
+{
+    <script src="~/bower_components/jquey datatable/DataTables-1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/jquey datatable/DataTables-1.10.25/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/Responsive-2.2.9/js/dataTables.responsive.min.js"></script>
+
+    <script src="~/bower_components/jQuery-confirm/jquery-confirm.min.js"></script>
+
+    <script src="~/plugins/MD.BootstrapPersianDateTimePicker-1.6.4-bootstrap3/Scripts/MdBootstrapPersianDateTimePicker/calendar.min.js"></script>
+    <script src="~/plugins/MD.BootstrapPersianDateTimePicker-1.6.4-bootstrap3/Scripts/MdBootstrapPersianDateTimePicker/jquery.Bootstrap-PersianDateTimePicker.min.js"></script>
+
+    <script>
+    let s=@Html.Raw(Json.Serialize(@statusModel));
+    $('#status').val(s);
+    if (s!==''){
+    changeStatus();
+    }
+        var table=$('#tableShowTasks').DataTable( {
+                    "rowReorder": {
+                      "selector": 'td:nth-child(2)'
+                    },
+                    "responsive": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
+                    "ajax": {
+                         "url": '@Url.Action("GetTasks", "Task")',
+                         "type": "Post",
+                         "dataType": "json",
+                         "data":{"dateP":function() {
+                           return $('#fromDate1').val();
+                         },
+                         "status":function() {
+                           return $('#status').val();
+                         }
+                         }
+                     },
+                    "columns":[
+                         {"data": "number"},
+                         {"data": "title"},
+                         {"data": "date"},
+                         {"data": "status",
+                         render:function(data,type,row) {
+                           if (data==0){
+                               return `<p class="btn-warning badge" >در حال انجام</p>`;
+                           }
+                           else {
+                               return `<p class="btn-success badge">انجام شده</p>`;
+                           }
+                         }},
+                         {"data": "time"},
+                         {"data": "parameters",
+                         render:function (data,type,row){
+                             if (data.enableEdit){
+                                 return `
+                                 <button data-id="${data.id}" class="btn btn-today btnShow pull-right" data-toggle="tooltip" data-placement="top" title="نمایش کار"><span class="fa fa-eye"></span></button>
+                                 <a href='/Task/EditTask/${data.id}' class="btn btn-today btnEdit pull-right" data-toggle="tooltip" data-placement="top" title="ویرایش کار"><span class="fa fa-edit"></span></a>
+                                 <button data-id="${data.id}" class="btn btn-today btnDelete pull-right" data-toggle="tooltip" data-placement="top" title="حذف کار"><span class="fa fa-trash"></span></button>
+                                 `;
+                             }
+                             else {
+                                 return `
+                                 <button data-id="${data.id}" class="btn btn-today btnShow pull-right" data-toggle="tooltip" data-placement="top" title="نمایش کار"><span class="fa fa-eye"></span></button>
+                                 `;
+                             }
+                             }
+                         }
+                         ] ,
+                    "language": {
+                            "url": "/bower_components/jquey datatable/Persian.json"
+                        }
+                } );
+    $('#tableShowTasks').on('draw.dt', function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+    </script>
+}

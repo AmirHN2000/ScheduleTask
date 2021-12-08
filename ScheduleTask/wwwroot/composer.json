@@ -1,0 +1,30 @@
+{
+  "name": "hosseinizadeh/AdminLTE_Persian",
+  "description": "AdminLTE Persian - admin control panel and dashboard that's based on Bootstrap 3",
+  "homepage": "http://hosseinizadeh.ir/adminlte/",
+  "type": "template",
+  "keywords": [
+    "css",
+    "js",
+    "less",
+    "responsive",
+    "back-end",
+    "template",
+    "theme",
+    "web",
+    "admin"
+  ],
+  "authors": [
+    {
+      "name": "Alireza Hosseinizadeh",
+      "email": "info@hosseinizadeh.ir"
+    }
+  ],
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/hosseinizadeh/AdminLTE_Persian/issues"
+  },
+  "require": {
+    "bower-asset/jquery": ">=1.9.0 <4.0.0"
+  }
+}

@@ -1,0 +1,209 @@
+﻿@using ScheduleTask.Utils
+@using DNTPersianUtils.Core
+@{
+  string userId = null;
+  if (User.Identity!=null&&User.Identity.IsAuthenticated)
+  {
+    userId = User.GetUserId();
+  }
+}
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>@ViewData["Title"]</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="~/dist/css/bootstrap-theme.css">
+  <link rel="icon" href="~/favicon.ico">
+  
+  <link rel="stylesheet" href="~/Css/Site.css">
+  
+  <link rel="stylesheet" href="~/bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <!-- Bootstrap rtl -->
+  <link rel="stylesheet" href="~/dist/css/rtl.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="~/bower_components/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="~/bower_components/Ionicons/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="~/dist/css/AdminLTE.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="~/dist/css/skins/_all-skins.min.css">
+
+  <!-- Google Font -->
+  <link rel="stylesheet" href="~/dist/fonts/googlefont.css">
+  
+  @await RenderSectionAsync("Css",false)
+</head>
+<!-- ADD THE CLASS sidebar-collapse TO HIDE THE SIDEBAR PRIOR TO LOADING THE SITE -->
+<body class="hold-transition skin-blue sidebar-mini">
+<!-- Site wrapper -->
+<div class="wrapper">
+
+  <header class="main-header">
+      @{
+        if (User.IsInRole("Admin"))
+        {
+          <a asp-controller="Home" asp-action="Dashboard" class="logo">
+          <span class="logo-mini">پنل</span>
+          <span class="logo-lg"><img src="~/Images/Logomin.png" alt="logo" class="pull-right" width="50" height="50"><b>پنل مدیریت</b></span>
+          </a>
+        }
+        else
+        {
+        <a asp-controller="Home" asp-action="Dashboard" class="logo"> 
+        <span class="logo-mini">پنل</span>
+        <span class="logo-lg"><img src="~/Images/Logomin.png" alt="logo" class="pull-right" width="50" height="50"><b>پنل کاربر</b></span>
+        </a>
+        }
+      }
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      
+      <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+              <span class="sr-only">Toggle navigation</span>
+      </a>
+      
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+          <li>
+            <a class="navbar-custom-menu">@DateTime.Now.ToPersianDateTextify()</a>
+          </li>
+          @{
+            if (User.Identity is {IsAuthenticated: true })
+            {
+              <li>
+                <a asp-controller="User" asp-action="Logout" class="navbar-custom-menu"><span class="fa fa-sign-out"></span> خروج</a>
+              </li>
+            }
+            else
+            {
+              <li>
+                <a asp-controller="User" asp-action="Login" class="navbar-custom-menu"><span class="fa fa-sign-in"></span> ورود</a>
+              </li>
+            }
+          }
+        </ul>
+      </div>
+      
+    </nav>
+  </header>
+  <!-- right side column. contains the logo and sidebar -->
+  <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <!-- Sidebar user panel -->
+      @await Component.InvokeAsync("Profile")
+      <br>
+      <!-- sidebar menu: : style can be found in sidebar.less -->
+      <ul class="sidebar-menu" data-widget="tree">
+        <li id="menuD"><a asp-controller="Home" asp-action="Dashboard"><i class="fa fa-dashboard"></i> <span>داشبورد</span></a></li>
+        @{
+          if (User.IsInRole("User"))
+          {
+
+            <li id="menuP"><a asp-controller="Task" asp-action="NewTask"><i class="fa fa-plus-square"></i> <span>افزودن کار</span></a></li>
+            <li id="menuST"><a asp-controller="Task" asp-action="ShowTasks"><i class="fa fa-tasks"></i> <span>نمایش کارها</span></a></li>
+          }
+          else
+          {
+            <li id="menuSTA"><a asp-controller="Task" asp-action="ShowTasksAdmin"><i class="fa fa-tasks"></i> <span>نمایش کارها</span></a></li>
+            <li id="menuPU"><a asp-controller="User" asp-action="AddUser"><i class="fa fa-user-plus"></i> <span>افزودن کاربر</span></a></li>
+            <li id="menuSU"><a asp-controller="User" asp-action="ShowUsers"><i class="fa fa-user"></i> <span>نمایش کاربران</span></a></li>
+            <li id="menuClock"><a asp-controller="Time" asp-action="EditTime"><i class="fa fa-clock-o"></i> <span>محدوده زمانی افزودن کار</span></a></li>
+          }
+        }
+        <li id="menuUU">
+          <a asp-controller="User" asp-action="UpdateUser" asp-route-id="@User.GetUserId()">
+            <i class="fa fa-pencil-square-o"></i> <span>ویرایش حساب کاربری</span>
+          </a></li>
+      </ul>
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <div class="content-header">
+      <breadcrumb></breadcrumb>
+    </div>
+    <!-- Content Header (Page header) -->
+
+    <!-- Main content -->
+    <section class="content">
+      @RenderBody()
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  @*<footer class="main-footer text-left">
+                                                      Set footer this   
+  </footer>*@
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <div class="tab-content">
+      <div class="tab-pane" id="control-sidebar-home-tab">
+        
+      </div>
+      <div class="tab-pane" id="control-sidebar-stats-tab">وضعیت</div>
+      <div class="tab-pane" id="control-sidebar-settings-tab">
+        <form method="post">
+
+        </form>
+      </div>
+    </div>
+  </aside>
+  <!-- /.control-sidebar -->
+  <!-- Add the sidebar's background. This div must be placed
+       immediately after the control sidebar -->
+  <div class="control-sidebar-bg"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 3 -->
+<script src="~/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="~/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- AdminLTE App -->
+<script src="~/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="~/dist/js/demo.js"></script>
+<script src="~/Js/Site.js"></script>
+
+<script>
+let userid=@Html.Raw(Json.Serialize(@userId));
+let link=self.location.pathname;
+if (link==='/Home/Dashboard')
+  $('#menuD').addClass('active');
+else if (link==='/Task/NewTask')
+       $('#menuP').addClass('active');
+else if (link==='/Task/ShowTasks')
+       $('#menuST').addClass('active');
+
+else if (link==='/User/AddUser')
+       $('#menuPU').addClass('active');
+else if (link==='/User/ShowUsers')
+       $('#menuSU').addClass('active');
+else if (link==='/Task/ShowTasksAdmin')
+       $('#menuSTA').addClass('active');
+else if (link==='/Home/HelpAdmin')
+       $('#menuHA').addClass('active');
+else if (link==='/Time/EditTime')
+       $('#menuClock').addClass('active');
+
+else if (userid!==""&&link==='/User/UpdateUser/'+userid)
+       $('#menuUU').addClass('active');
+
+</script>
+
+@await RenderSectionAsync("Script",false)
+
+</body>
+</html>

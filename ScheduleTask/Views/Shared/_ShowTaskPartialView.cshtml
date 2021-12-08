@@ -1,0 +1,50 @@
+﻿@model ScheduleTask.Models.Task.ShowTaskPartial
+
+<div class="row">
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="col-md-6 col-xs-12">
+            <p class="pull-right"><strong>کاربر:</strong> @Model.FullName</p>
+        </div>
+        <div class="col-md-6 col-md-offset-6"></div>
+    }
+    
+    <div class="col-md-6">
+        <p class="pull-right"><strong>نام کار:</strong> @Model.Title</p>
+    </div>
+    <div class="col-md-6">
+        <p class="pull-right"><strong>تاریخ ایجاد:</strong> @Model.CreateDate</p>
+    </div>
+    @{
+        if (!string.IsNullOrEmpty(Model.ModifyDate))
+        {
+            <div class="col-md-6">
+                <p class="pull-right"><strong>تاریخ آخرین ویرایش:</strong> @Model.ModifyDate</p>
+            </div>
+            <div class="col-md-6 col-md-offset-6"></div>
+        }
+        <div class="col-md-6">
+            <p class="pull-right"><strong>زمان تقریبی انجام کار : </strong> @Model.Time</p>
+        </div>
+        <div class="col-md-6 col-md-offset-6"></div>
+        if ((int) Model.Status == 0)
+        {
+            <div class="col-md-6">
+                <p class="pull-right"><strong>وضعیت:</strong> <span class="btn-warning badge">در حال انجام</span></p>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-6">
+                <p class="pull-right"><strong>وضعیت:</strong> <span class="btn-success badge">انجام شده</span></p>
+            </div>
+        }
+        if (!string.IsNullOrEmpty(Model.FinishDate))
+        {
+            <div class="col-md-6">
+                <p class="pull-right"><strong>تاریخ انجام کار:</strong> @Model.FinishDate</p>
+            </div>
+        }
+    }
+</div>
+

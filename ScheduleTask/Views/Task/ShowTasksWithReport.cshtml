@@ -1,0 +1,364 @@
+﻿@using TaskStatus = ScheduleTask.Data.TaskStatus
+@model ScheduleTask.Models.Home.DashboardViewModel
+@{
+    ViewBag.Title = "نمایش کارهای کاربر";
+    var done = "انجام شده(درصد)";
+    var pending = "در حال انجام(درصد)";
+    var doneC = Model.DoneD;
+    var pendingC = Model.PendingD;
+}
+<div class="text-center">
+    <div class="panel panel-default">
+
+    <input type="hidden" id="SelectUser"/>
+    
+    <div class="panel-heading">
+            <p class="text text-black">جستجوی پیشرفته</p>
+        </div>
+        <div class="panel-body">
+	        <div class="row">
+		        <div class="col-md-3 col-xs-12">
+			        <div class="form-group">
+				        <div class="input-group">
+					        <div class="input-group-addon" data-mddatetimepicker="true" data-trigger="click" data-targetselector="#fromDate1"
+					             data-groupid="group1" data-fromdate="true">
+						        <span class="glyphicon glyphicon-calendar" data-toggle="tooltip" data-placement="top" title="انتخاب تاریخ"></span>
+					        </div>
+					        <input name="fromDate1" autocomplete="false" onchange="changeDate()" class="form-control" id="fromDate1" placeholder="تاریخ" data-mddatetimepicker="true"
+					               data-placement="bottom" data-englishnumber="false" data-groupid="group1" data-fromdate="true" style="width: 80%"/>
+					        <button id="btnClear" class="btn btn-sm btn-today btnDelete"
+					                data-toggle="tooltip" data-placement="top" title="حذف تاریخ">
+						        <span class="fa fa-trash"></span>
+					        </button>
+				        </div>
+			        </div>
+			        <div class="form-group">
+				        <div class="input-group">
+					        <div class="input-group-addon" data-mddatetimepicker="true" data-trigger="click"
+					             data-targetselector="#toDate1" data-groupid="group1" data-todate="true"
+					             data-enabletimepicker="false" data-placement="bottom">
+						        <span class="glyphicon glyphicon-calendar"></span>
+					        </div>
+					        <input type="text" class="form-control" id="toDate1" placeholder="تا تاریخ"
+					               data-mddatetimepicker="true" data-trigger="click" data-targetselector="#toDate1"
+					               data-groupid="group1" data-todate="true" data-enabletimepicker="false"
+					               data-placement="bottom" autocomplete="false" style="width: 80%" onchange="changeToDate()"/>
+					        <button id="btnClearDates" class="btn btn-sm btn-today btnDelete"
+					                data-toggle="tooltip" data-placement="top" title="حذف بازه تاریخ">
+						        <span class="fa fa-trash"></span>
+					        </button>
+				        </div>
+			        </div>
+		        </div>
+		        <div class="col-md-3 col-xs-12">
+			        <div class="form-group">
+				        <div class="row">
+					        <div class="col-md-3 col-xs-3">
+						        <label class="text text-black" style="margin-top: 5px">وضعیت:</label>
+					        </div>
+					        <div class="col-md-7 col-xs-7">
+						        <select class="form-control" asp-items="@Html.GetEnumSelectList(typeof(TaskStatus))"
+						                id="status" data-toggle="tooltip" data-placement="top" title="انتخاب وضعیت" onchange="changeStatus()">
+							        <option value="-1">همه</option>
+						        </select>
+					        </div>
+				        </div>
+			        </div>
+		        </div>
+
+		        <div class="col-md-5 col-xs-12 pull-left">
+			        <div class="form-group">
+				        <button id="ExportExcel" class="btn btn-block" style="background-color: #017338;color: white"
+				                data-toggle="tooltip" data-placement="top" title="دریافت خروجی اکسل">
+					        <span class="fa fa-file-excel-o"></span> دریافت خروجی اکسل</button>
+			        </div>
+			        <div class="form-group">
+				        <button id="btnSearch" class="btn btn-primary btn-block"
+				                data-toggle="tooltip" data-placement="top" title="جستجو">
+					        <span class="fa fa-search"></span> جستجو
+				        </button>
+			        </div>
+		        </div>
+		        
+		        <div class="form-group col-md-12">
+			        <div class="col-md-2 col-xs-12 pull-right">
+				        <button id="btnClearAllFilter" type="button" class="btn btnDelete btn-today btn-danger">حذف همه فیلترها</button>
+			        </div>
+			        <div class="col-md-8 col-xs-12 pull-right" style="margin: 8px">
+				        <label class="pull-right">فیلتر ها :: </label>
+				        <label id="dateFilter" class="pull-right img-rounded badgeFilter"></label>
+				        <label id="toDateFilter" class="pull-right img-rounded badgeFilter"></label>
+				        <label id="statusFilter" class="pull-right img-rounded badgeFilter"></label>
+			        </div>
+		        </div>
+	        </div>
+        </div>
+	    
+	    
+	    <div class="row">
+            <div class="col-md-7 col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                                        <p class="text text-black">لیست کارها</p>
+                                    </div>
+                    <div class="panel-body" id="mydiv">
+                        <table id="tableShowTasksWithReport" class="table table-bordered table-striped table-hover table-responsive" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th>شماره</th>
+                                <th>نام کاربر</th>
+                                <th>نام کار</th>
+                                <th>تاریخ ایجاد</th>
+	                            <th>وضعیت</th>
+	                            <th>زمان تقریبی انجام کار</th>
+                                <th>عملیات</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                    
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <p class="text text-black">گزارش عملکرد</p>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+	                        <div class="col-lg-12 text-center" style="margin-top: 50px">
+		                        @{
+			                        if (User.IsInRole("Admin"))
+			                        {
+				                        <div class="form-group">
+					                        <div class="info-box">
+						                        <span class="info-box-icon bg-aqua"><i class="fa fa-tasks"></i></span>
+                        
+						                        <div class="info-box-content">
+							                        <span class="info-box-text">کارها ثبت شده</span>
+							                        <span class="info-box-number" style="margin-top: 15px">@Model.Total</span>
+						                        </div>
+						                        <!-- /.info-box-content -->
+					                        </div>
+				                        </div>
+				                        <div class="form-group">
+					                        <div class="info-box">
+						                        <span class="info-box-icon bg-green"><i class="fa fa-check-square-o"></i></span>
+                        
+						                        <div class="info-box-content">
+							                        <span class="info-box-text">کارهای انجام شده</span>
+							                        <span class="info-box-number" style="margin-top: 15px">@Model.Done</span>
+						                        </div>
+						                        <!-- /.info-box-content -->
+					                        </div>
+				                        </div>
+				                        <div class="form-group">
+					                        <div class="info-box">
+						                        <span class="info-box-icon bg-yellow"><i class="fa fa-hourglass-half"></i></span>
+                        
+						                        <div class="info-box-content">
+							                        <span class="info-box-text">کارهای در حال انجام</span>
+							                        <span class="info-box-number" style="margin-top: 15px">@Model.Pending</span>
+						                        </div>
+						                        <!-- /.info-box-content -->
+					                        </div>
+				                        </div>
+			                        }
+			                        else
+			                        {
+				                        <a asp-controller="Task" asp-action="ShowTasks" class="Dashboard-link">
+					                        <div class="form-group Dashboard-box">
+						                        <div class="info-box">
+							                        <span class="info-box-icon bg-aqua"><i class="fa fa-tasks"></i></span>
+                        
+							                        <div class="info-box-content">
+								                        <span class="info-box-text">کارها ثبت شده</span>
+								                        <span class="info-box-number" style="margin-top: 15px">@Model.Total</span>
+							                        </div>
+							                        <!-- /.info-box-content -->
+						                        </div>
+					                        </div>
+				                        </a>
+				                        <a asp-controller="Task" asp-action="ShowTasks" asp-route-status="1" class="Dashboard-link">
+					                        <div class="form-group Dashboard-box">
+						                        <div class="info-box">
+							                        <span class="info-box-icon bg-green"><i class="fa fa-check-square-o"></i></span>
+                        
+							                        <div class="info-box-content">
+								                        <span class="info-box-text">کارهای انجام شده</span>
+								                        <span class="info-box-number" style="margin-top: 15px">@Model.Done</span>
+							                        </div>
+							                        <!-- /.info-box-content -->
+						                        </div>
+					                        </div>
+				                        </a>
+				                        <a asp-controller="Task" asp-action="ShowTasks" asp-route-status="0" class="Dashboard-link">
+					                        <div class="form-group Dashboard-box">
+						                        <div class="info-box">
+							                        <span class="info-box-icon bg-yellow"><i class="fa fa-hourglass-half"></i></span>
+                        
+							                        <div class="info-box-content">
+								                        <span class="info-box-text">کارهای در حال انجام</span>
+								                        <span class="info-box-number" style="margin-top: 15px">@Model.Pending</span>
+							                        </div>
+							                        <!-- /.info-box-content -->
+						                        </div>
+					                        </div>
+				                        </a>
+			                        }
+		                        }
+	                        </div>
+	                        @if (Model.Total != 0)
+	                        {
+		                        <div class="col-lg-12 text-center" style="margin-top: 20px">
+			                        <div class="panel panel-default">
+				                        <div class="panel-heading">
+					                        <p>عملکرد کاربر در انجام کارها</p>
+				                        </div>
+				                        <div id="canvas-holder panel-body">
+					                        <canvas id="chart-area" width="300" height="300"/>
+				                        </div>
+			                        </div>
+		                        </div>
+	                        }
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+        </div>
+    </div>
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="mymodal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content text-center">
+                <div class="modal-header" style="background-color: #f5f5f5">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">اطلاعات کار</h4>
+                </div>
+                <div class="modal-body">
+                        
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">بستن</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+
+
+@section Css
+{
+    <link rel="stylesheet" href="~/bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="~/bower_components/jquey datatable/DataTables-1.10.25/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="~/bower_components/Responsive-2.2.9/css/responsive.dataTables.css">
+    
+    <link rel="stylesheet" href="~/bower_components/jQuery-confirm/jquery-confirm.min.css">
+        
+    <link rel="stylesheet" href="~/plugins/MD.BootstrapPersianDateTimePicker-1.6.4-bootstrap3/Content/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="~/plugins/MD.BootstrapPersianDateTimePicker-1.6.4-bootstrap3/Content/MdBootstrapPersianDateTimePicker/jquery.Bootstrap-PersianDateTimePicker.min.css">
+}
+@section Script
+{
+    <script src="~/bower_components/jquey datatable/DataTables-1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="~/bower_components/jquey datatable/DataTables-1.10.25/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/bower_components/Responsive-2.2.9/js/dataTables.responsive.min.js"></script>
+
+    <script src="~/bower_components/jQuery-confirm/jquery-confirm.min.js"></script>
+
+    <script src="~/plugins/MD.BootstrapPersianDateTimePicker-1.6.4-bootstrap3/Scripts/MdBootstrapPersianDateTimePicker/calendar.min.js"></script>
+    <script src="~/plugins/MD.BootstrapPersianDateTimePicker-1.6.4-bootstrap3/Scripts/MdBootstrapPersianDateTimePicker/jquery.Bootstrap-PersianDateTimePicker.min.js"></script>
+    <script src="~/bower_components/chart.js/Chart.min.js"></script>
+    
+    <script>
+    
+    let userid=@Html.Raw(Json.Serialize(@ViewData["userId"]));
+	$('#SelectUser').val(userid);
+        var table=$('#tableShowTasksWithReport').DataTable( {
+        			"rowReorder": {
+                        "selector": 'td:nth-child(2)'
+                    },
+                    "responsive": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
+                    "ajax": {
+                         "url": '@Url.Action("GetTasksAdmin", "Task")',
+                         "type": "Post",
+                         "dataType": "json",
+                         "data":{"dateP":function () {
+                           return $('#fromDate1').val();
+                         },
+                         "fromDate":function () {
+                           return $('#fromDate1').val();
+                         },
+                          "toDate":function () {
+                           return $('#toDate1').val();
+                         },
+                         "status":function () {
+                           return $('#status').val();
+                         },
+                         "userId":userid
+                         }
+                     },
+                    "columns":[
+                         {"data": "number"},
+                         {"data": "fullName"},
+                         {"data": "title"},
+                         {"data": "date"},
+                         {"data": "status",
+                         render:function(data,type,row) {
+                           if (data==0){
+                               return `<p class="btn-warning badge" >در حال انجام</p>`;
+                           }
+                           else {
+                               return `<p class="btn-success badge">انجام شده</p>`;
+                           }
+                         }},
+                         {"data": "time"},
+                         {"data": "id",
+                         render:function (data,type,row){
+                             return `
+                             <button data-id="${data}" data-toggle="tooltip" data-placement="top" title="نمایش کار" class="btn btn-today btnShow pull-right"><span class="fa fa-eye"></span></button>
+                             `;
+                             }
+                         }
+                         ] ,
+                    "language": {
+                            "url": "/bower_components/jquey datatable/Persian.json"
+                        }
+                } );
+        
+        let Done=@Html.Raw(Json.Serialize(@done));
+        let Pending=@Html.Raw(Json.Serialize(@pending));
+        let DoneC=@Html.Raw(Json.Serialize(@doneC));
+        let PendingC=@Html.Raw(Json.Serialize(@pendingC));
+        let pieData = [
+        	{
+        		value: DoneC,
+        		color: "#00a65a",
+        		highlight: "#098421",
+        		label: Done
+        	},
+        	{
+        		value: PendingC,
+        		color: "#f39c12",
+        		highlight: "#d0870c",
+        		label:Pending
+        	},
+        ];
+      
+       window.onload = function(){
+       	let ctx = document.getElementById("chart-area").getContext("2d");
+       	window.myPie = new Chart(ctx).Pie(pieData);
+       };
+	   
+	   $('#tableShowTasksWithReport').on('draw.dt', function() {
+           $('[data-toggle="tooltip"]').tooltip();
+       });
+    </script>
+}

@@ -1,0 +1,222 @@
+﻿@using TaskStatus = ScheduleTask.Data.TaskStatus
+@model List<ScheduleTask.Models.Task.ShowTaskViewModel>
+@{
+    ViewBag.Title = "افزودن کار جدید";
+}
+
+<div class="text-center">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <p class="text text-black">@ViewBag.Title</p>
+        </div>
+        <div class="panel-heading">
+            <br>
+            <div class="row">
+                <form data-ajax="true" data-ajax-url="/Task/AddTask" data-ajax-method="post"
+                      data-ajax-success="SuccessAddTask" data-ajax-loading="#spinner2" id="myform2">
+                    <div class="col-md-5 col-xs-12">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <input type="text" name="Title" class="form-control" placeholder="نام کار جدید"
+                                   autofocus="autofocus" minlength="3" required>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-5 col-sm-5 col-xs-12">
+                                <p style="margin-top: 7px">زمان تقریبی انجام کار:</p>
+                            </div>
+                            <div class="form-group col-md-7 col-sm-7 col-xs-12 row">
+                                <div class="col-md-4 col-md-offset-0 col-sm-4 col-sm-offset-0 col-xs-3 col-xs-offset-3">
+                                    <input type="number" name="Minute" class="form-control pull-right" 
+                                           style="width: 65px" data-toggle="tooltip" data-placement="top" title="دقیقه"
+                                           min="0" max="59" required>
+                                </div>
+                                <div class="col-md-1 col-sm-1 col-sm-offset-1 col-xs-1">
+                                    <label style="margin-top: 8px;">:</label>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-sm-offset-1 col-xs-3">
+                                    <input type="number" name="Hour" class="form-control pull-left"
+                                           style="width: 65px" data-toggle="tooltip" data-placement="top" title="ساعت"
+                                           min="0" max="24" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-xs-12">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block formClick"><div class="overlay"> افزودن
+                                <i style="display: none" id="spinner2">
+                                    <span class="fa fa-refresh fa-spin"></span>
+                                </i>
+                            </div></button>
+                        </div>
+                        <div class="form-group" style="width: 50%;margin: auto;">
+                            <div id="errors" class="text text-danger"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel-heading">
+            <p class="text text-black">لیست کارهای امروز</p>
+        </div>
+        <div class="panel-body">
+            
+            @{
+                if (!Model.Any()){
+                    <p>برای امروز هنوز کاری ثبت نشده است</p>
+                }
+                else
+                {
+                    <form data-ajax="true" data-ajax-method="post" data-ajax-success="SuccessEdit" 
+                          data-ajax-loading="#spinner">
+                        @Html.AntiForgeryToken()
+                        <table class="table table-bordered table-striped table-hover text-center">
+                            <thead>
+                            <tr>
+                                <th>شماره</th>
+                                <th>تغییر وضعیت</th>
+                                <th>عنوان</th>
+                                <th>وضعیت</th>
+                                <th>زمان تقریبی انجام کار</th>
+                                <th>عملیات</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @for (int i = 0; i < Model.Count; i++)
+                            {
+                                <input type="hidden" asp-for="@Model[i].Id">
+                                <tr>
+                                    <td>@Model[i].Number</td>
+                                    <td><input asp-for="@Model[i].Selected"></td>
+                                    <td>@Model[i].Title</td>
+                                    @{
+                                        <input type="hidden" asp-for="@Model[i].Status"/>
+                                        if (Model[i].Status)
+                                        {
+                                            <td><span class="badge btn-success">انجام شده</span></td>
+                                        }
+                                        else
+                                        {
+                                            <td><span class="badge btn-warning">در حال انجام</span></td>
+                                        }
+                                    }
+                                    <td>@Model[i].Time</td>
+                                    <td>
+                                        <a data-toggle="tooltip" data-placement="top" title="ویرایش" class="btn btn-today btnEdit" asp-controller="Task" asp-action="EditTask"
+                                           asp-route-id="@Model[i].Id" asp-route-pageBack="NewTask"><span class="fa fa-edit"></span></a>
+                                        <a data-toggle="tooltip" data-placement="top" title="حذف" class="btn btn-today btnDelete" data-id="@Model[i].Id"><span class="fa fa-trash"></span></a>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-2 col-sm-3 col-xs-6">
+                                <select style="margin-top: 3px" class="form-control select2-container" name="toStatus"
+                                        asp-items="@Html.GetEnumSelectList(typeof(TaskStatus))"></select>
+                            </div>
+                            <div class="col-md-2 col-sm-3 col-xs-6">
+                                <button type="submit" class="btn btn-primary pull-right">
+                                    <div class="overlay"> اعمال تغییرات
+                                        <i style="display: none" id="spinner">
+                                            <span class="fa fa-refresh fa-spin"></span>
+                                        </i>
+                                    </div></button>
+                            </div>
+                        </div>
+                    </form>
+                }
+            }
+        </div>
+    </div>
+</div>
+@section Css
+{
+    <link rel="stylesheet" href="~/bower_components/jQuery-confirm/jquery-confirm.min.css">
+}
+@section Script
+{
+    <script src="~/bower_components/jQuery-confirm/jquery-confirm.min.js"></script>
+    <script src="~/bower_components/Jquery_validation/jquery.validate.min.js"></script>
+    <script src="~/bower_components/Jquery_validation/messages_fa.min.js"></script>
+    <script src="~/bower_components/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/bower_components/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+
+    <script>
+    $("#myform2").validate({
+      errorPlacement: function(error, element) {
+         error.appendTo('#errors');
+       },
+       messages:{
+          Title:{
+            required:"تکمیل فیلد نام کار اجباری است",
+            minlength:"لطفا برای نام کار کمتر از {0} حرف وارد نکنید"
+          },
+          Minute:{
+            required:"تکمیل فیلد دقیقه اجباری است",
+            min:"لطفا برای دقیقه کمتر از {0} وارد نکنید",
+            max:"لطفا برای دقیقه بیشتر از {0} وارد نکنید"
+          },
+          Hour:{
+            required:"تکمیل فیلد ساعت اجباری است",
+            min:"لطفا برای ساعت کمتر از {0} وارد نکنید",
+            max:"لطفا برای ساعت بیشتر از {0} وارد نکنید"
+          }
+       }
+    }); 
+    
+    $('.btnDelete').on('click', function() {
+      let id=$(this).data('id');
+      
+      $.ajax({
+            url:'@Url.Action("DeleteTask", "Task")',
+            type:'Post',
+            datatype:'json',
+            data:{taskId : id},
+            success:function(data) {
+              if (data.status){
+                  location.reload();
+                  }
+              else {
+                  $.confirm({
+                      title: 'خطا!!!',
+                      content: data.message,
+                      type: 'red',
+                      typeAnimated: true,
+                      buttons: {
+                          close: {
+                              text: 'Ok',
+                              btnClass: 'btn-red',
+                              action: function(){
+                              }
+                          },
+                      }
+                  });
+              }
+            },
+            error:function() {
+              alert('خطا در حذف کار');
+            }
+            });
+    });
+    
+    function SuccessEdit(data) {
+      if (data.status){
+          location.reload();
+      }
+    }
+    
+    function SuccessAddTask(data) {
+        if (data.status){
+        location.reload();
+        }
+        else{
+            $('#errors').empty();
+            for (let i in data.message){
+               $('#errors').append(data.message[i]).append('<br>');
+               }
+        }
+      }
+    </script>
+}

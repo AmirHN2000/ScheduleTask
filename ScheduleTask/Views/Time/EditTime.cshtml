@@ -1,0 +1,101 @@
+﻿@model ScheduleTask.Models.Time.EditTimeViewModel
+
+@{
+    ViewBag.Title = "تغییر محدوده زمان";
+}
+
+<div class="panel panel-default">
+    <div class="panel-heading text-center">
+        <p class="text text-black">تغییر محدوده زمانی اضافه کردن کار</p>
+    </div>
+    <div class="panel-body">
+        <form id="myform" data-ajax="true" data-ajax-method="post" data-ajax-success="SuccessEditTime"
+              data-ajax-loading="#spinner" class="row">
+            @Html.AntiForgeryToken()
+            <input asp-for="Name" type="hidden">
+            <div class="form-group text-center col-md-2 col-xs-12">
+                <p class="text text-black" style="margin-top: 8px">محدوده زمانی فعلی : </p>
+            </div>
+            <div class="form-group col-md-3 col-md-offset-0 col-sm-5 col-sm-offset-4 col-xs-12 row">
+                <div class="col-md-4 col-md-offset-0 col-sm-4 col-sm-offset-0 col-xs-3 col-xs-offset-3">
+                    <input asp-for="Minute" class="form-control pull-right" style="width: 65px" data-toggle="tooltip"
+                           data-placement="top" title="دقیقه" min="0" max="60" required>
+                </div>
+                <div class="col-md-1 col-sm-1 col-sm-offset-1 col-xs-1">
+                    <label style="margin-top: 8px;">:</label>
+                </div>
+                <div class="col-md-4 col-sm-4 col-sm-offset-1 col-xs-3">
+                    <input asp-for="Hour" class="form-control pull-left" style="width: 65px" data-toggle="tooltip"
+                           data-placement="top" title="ساعت" min="0" max="24" required>
+                </div>
+            </div>
+            <div class="form-group col-md-4 col-xs-12">
+                <button type="submit" class="btn btn-warning btn-block center-block"><div class="overlay"> تغییر
+                    <i style="display: none" id="spinner">
+                        <span class="fa fa-refresh fa-spin"></span>
+                    </i>
+                </div></button>
+            </div>
+            <div id="errors" class="text text-danger text-center col-md-3 col-xs-12"></div>
+        </form>
+        <br/>
+        <div class="alert alert-circled" style="background-color: #f5f5f5">
+            <p class="text text-black">راهنمایی : </p>
+            <br>
+            <p>کاربران از ساعت 12 شب تا زمان مشخص شده در این قسمت، می توانند کار های خود را ثبت کنند.</p>
+            <br>
+            <p>برای اینکه کاربر در تمام طول روز بتواند کارهای خود را ثبت کند، باید محدوده زمانی ساعت 24:00 قرار داه شود.</p>
+        </div>
+    </div>
+</div>
+@section Css
+{
+    <link rel="stylesheet" href="~/bower_components/jquery-toast-plugin/dist/jquery.toast.min.css">
+}
+@section Script
+{
+    <script src="~/bower_components/Jquery_validation/jquery.validate.min.js"></script>
+    <script src="~/bower_components/Jquery_validation/messages_fa.min.js"></script>
+    <script src="~/bower_components/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/bower_components/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+    
+    <script src="~/bower_components/jquery-toast-plugin/dist/jquery.toast.min.js"></script>
+
+    <script>
+    $("#myform").validate({
+      errorPlacement: function(error, element) {
+         error.appendTo('#errors');
+       },
+       messages:{
+          Minute:{
+            required:"تکمیل فیلد دقیقه اجباری است",
+            min:"لطفا برای دقیقه کمتر از {0} وارد نکنید",
+            max:"لطفا برای دقیقه بیشتر از {0} وارد نکنید"
+          },
+          Hour:{
+            required:"تکمیل فیلد ساعت اجباری است",
+            min:"لطفا برای ساعت کمتر از {0} وارد نکنید",
+            max:"لطفا برای ساعت بیشتر از {0} وارد نکنید"
+          }
+       }
+    });
+    
+    function SuccessEditTime(data) {
+            $('#errors').empty();
+          if (data.status){
+              $.toast({
+                  heading: 'موفقیت آمیز',
+                  text: data.message,
+                  showHideTransition: 'slide',
+                  position: 'top-left',
+                  hideAfter:2500,
+                  icon: 'success'
+              });
+          }
+          else {
+              for (let i in data.message)
+                   $('#errors').append(data.message[i]).append('<br>');
+          }
+        }
+    </script>
+}

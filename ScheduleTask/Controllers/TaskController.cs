@@ -313,6 +313,7 @@ namespace ScheduleTask.Controllers
         {
             ViewData["userId"] = id;
             var model = await _taskService.ReportTasks(id);
+            model.FullName = "کاربر : "+_userService.GetFullName(id);
             
             return View(model);
         }

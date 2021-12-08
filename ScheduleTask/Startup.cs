@@ -79,12 +79,10 @@ namespace ScheduleTask
             });
             
             services.AddBreadcrumbs(GetType().Assembly);
-            services.AddWebMarkupMin(options =>
-            {
-                options.AllowCompressionInDevelopmentEnvironment=true;
-                options.AllowMinificationInDevelopmentEnvironment=true;
-            }).AddHtmlMinification()
-                .AddHttpCompression();
+            
+            services.AddWebMarkupMin()
+            .AddHtmlMinification()
+            .AddHttpCompression();
             
             services.AddControllersWithViews()
                 .AddRazorRuntimeCompilation();

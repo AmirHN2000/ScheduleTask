@@ -4,8 +4,6 @@
     ViewBag.Title = "نمایش کارهای کاربر";
     var done = "انجام شده(درصد)";
     var pending = "در حال انجام(درصد)";
-    var doneC = Model.DoneD;
-    var pendingC = Model.PendingD;
 }
 <div class="text-center">
     <div class="panel panel-default">
@@ -89,6 +87,7 @@
 				        <label id="dateFilter" class="pull-right img-rounded badgeFilter"></label>
 				        <label id="toDateFilter" class="pull-right img-rounded badgeFilter"></label>
 				        <label id="statusFilter" class="pull-right img-rounded badgeFilter"></label>
+				        <label id="userFilterReport" class="pull-right img-rounded badgeFilter"></label>
 			        </div>
 		        </div>
 	        </div>
@@ -275,90 +274,106 @@
     <script src="~/bower_components/chart.js/Chart.min.js"></script>
     
     <script>
-    
-    let userid=@Html.Raw(Json.Serialize(@ViewData["userId"]));
-	$('#SelectUser').val(userid);
-        var table=$('#tableShowTasksWithReport').DataTable( {
-        			"rowReorder": {
-                        "selector": 'td:nth-child(2)'
-                    },
-                    "responsive": true,
-                    "processing": true,
-                    "serverSide": true,
-                    "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
-                    "ajax": {
-                         "url": '@Url.Action("GetTasksAdmin", "Task")',
-                         "type": "Post",
-                         "dataType": "json",
-                         "data":{"dateP":function () {
-                           return $('#fromDate1').val();
-                         },
-                         "fromDate":function () {
-                           return $('#fromDate1').val();
-                         },
-                          "toDate":function () {
-                           return $('#toDate1').val();
-                         },
-                         "status":function () {
-                           return $('#status').val();
-                         },
-                         "userId":userid
+    var table;
+	$(document).ready(function() {
+	    let userid=@Html.Raw(Json.Serialize(@ViewData["userId"]));
+        $('#SelectUser').val(userid);
+	});
+	$(document).ready(function() {
+	    let fullName=@Html.Raw(Json.Serialize(@Model.FullName));
+        $('#userFilterReport').text(fullName);
+	});
+    $(document).ready(function() {
+		let userid=@Html.Raw(Json.Serialize(@ViewData["userId"]));
+        table=$('#tableShowTasksWithReport').DataTable( {
+            "rowReorder": {
+                  "selector": 'td:nth-child(2)'
+              },
+              "responsive": true,
+              "processing": true,
+              "serverSide": true,
+              "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
+              "ajax": {
+                   "url": '@Url.Action("GetTasksAdmin", "Task")',
+                   "type": "Post",
+                   "dataType": "json",
+                   "data":{"dateP":GetDateP,
+                   "fromDate":GetFromDate,
+                  "toDate":GetToDate,
+                 "status":GetStatus,
+                 "userId":userid
+                 }
+             },
+            "columns":[
+                 {"data": "number"},
+                 {"data": "fullName"},
+                 {"data": "title"},
+                 {"data": "date"},
+                 {"data": "status",
+                 render:function(data,type,row) {
+                   if (data===0){
+                           return `<p class="btn-warning badge" >در حال انجام</p>`;
+                       }
+                       else {
+                           return `<p class="btn-success badge">انجام شده</p>`;
+                       }
+                     }},
+                     {"data": "time"},
+                     {"data": "id",
+                     render:function (data,type,row){
+                         return `
+                         <button data-id="${data}" data-toggle="tooltip" data-placement="top" title="نمایش کار" class="btn btn-today btnShow pull-right"><span class="fa fa-eye"></span></button>
+                         `;
                          }
-                     },
-                    "columns":[
-                         {"data": "number"},
-                         {"data": "fullName"},
-                         {"data": "title"},
-                         {"data": "date"},
-                         {"data": "status",
-                         render:function(data,type,row) {
-                           if (data==0){
-                               return `<p class="btn-warning badge" >در حال انجام</p>`;
-                           }
-                           else {
-                               return `<p class="btn-success badge">انجام شده</p>`;
-                           }
-                         }},
-                         {"data": "time"},
-                         {"data": "id",
-                         render:function (data,type,row){
-                             return `
-                             <button data-id="${data}" data-toggle="tooltip" data-placement="top" title="نمایش کار" class="btn btn-today btnShow pull-right"><span class="fa fa-eye"></span></button>
-                             `;
-                             }
-                         }
-                         ] ,
-                    "language": {
-                            "url": "/bower_components/jquey datatable/Persian.json"
-                        }
-                } );
-        
-        let Done=@Html.Raw(Json.Serialize(@done));
-        let Pending=@Html.Raw(Json.Serialize(@pending));
-        let DoneC=@Html.Raw(Json.Serialize(@doneC));
-        let PendingC=@Html.Raw(Json.Serialize(@pendingC));
-        let pieData = [
-        	{
-        		value: DoneC,
-        		color: "#00a65a",
-        		highlight: "#098421",
-        		label: Done
-        	},
-        	{
-        		value: PendingC,
-        		color: "#f39c12",
-        		highlight: "#d0870c",
-        		label:Pending
-        	},
-        ];
-      
-       window.onload = function(){
-       	let ctx = document.getElementById("chart-area").getContext("2d");
-       	window.myPie = new Chart(ctx).Pie(pieData);
-       };
-	   
-	   $('#tableShowTasksWithReport').on('draw.dt', function() {
-           $('[data-toggle="tooltip"]').tooltip();
-       });
+                     }
+                     ] ,
+                "language": {
+                        "url": "/bower_components/jquey datatable/Persian.json"
+                    }
+            } );
+    });
+
+	$(document).ready(function() {
+	  $('#tableShowTasksWithReport').on('draw.dt', function() {
+          $('[data-toggle="tooltip"]').tooltip();
+      });
+	});
+	
+	$(document).ready(function() {
+	  $('#ExportExcel').on('click', function() {
+		  let userid=@Html.Raw(Json.Serialize(@ViewData["userId"]));
+              $.ajax({
+                  url:'/Task/CreateLinkForExcelFile',
+                  method:'Post',
+                  data:{"dateP":GetDateP, "fromDate":GetFromDate, "toDate":GetToDate, "status":GetStatus, "userId":userid},
+                  success:function(data) {
+                      window.location.href=data.link;
+                  }
+              });
+          });
+	});
+	
+	let Done=@Html.Raw(Json.Serialize(@done));
+    let Pending=@Html.Raw(Json.Serialize(@pending));
+    let DoneC=@Html.Raw(Json.Serialize(@Model.DoneD));
+    let PendingC=@Html.Raw(Json.Serialize(@Model.PendingD));
+    let pieData = [
+    	{
+    		value: DoneC,
+    		color: "#00a65a",
+    		highlight: "#098421",
+    		label: Done
+    	},
+    	{
+    		value: PendingC,
+    		color: "#f39c12",
+    		highlight: "#d0870c",
+    		label:Pending
+    	},
+    ];
+ 	window.onload = function(){
+                	let ctx = document.getElementById("chart-area").getContext("2d");
+                	window.myPie = new Chart(ctx).Pie(pieData);
+                };
     </script>
 }

@@ -9,5 +9,6 @@
         public int PendingD { get; set; }
         
         public int UserCount { get; set; }
+        public string FullName { get; set; }
     }
 }

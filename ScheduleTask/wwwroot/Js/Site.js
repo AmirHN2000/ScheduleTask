@@ -111,6 +111,7 @@ $('#mydiv').on('click', '.btnShow', function() {
 
 $('#btnSearch').on('click', function() {
     table.ajax.reload();
+    table
 });
 
 $('#mydiv').on('click', '.btnDelete', function() {
